@@ -1,24 +1,49 @@
 from aiogram.fsm.state import StatesGroup, State
 from aiogram.types import CallbackQuery
 from aiogram_dialog import Dialog, DialogManager, Window
-from aiogram_dialog.widgets.kbd import Button
-from aiogram_dialog.widgets.text import Const
+from aiogram_dialog.widgets.kbd import Button, ScrollingGroup, Select
+from aiogram_dialog.widgets.text import Const, Format
+
+from app.db.functions import User, Group
+from typing import Any
+from operator import itemgetter
 
 
-class SampleDialog(StatesGroup):
-    greeting = State()
+class GroupDialog(StatesGroup):
+    choice = State()
 
 
-async def show_alert(c: CallbackQuery, _: Button, manager: DialogManager):
-    await c.answer("❗️ Тестовое уведомление", show_alert=True, cache_time=0)
+async def callback(c: CallbackQuery, widget: Any, manager: DialogManager, item_id: str):
+    groups = await Group.get_all_groups()
+    await User.edit_group(c.message.chat.id, groups[int(item_id)])
+    await c.answer("Группа выбрана!", show_alert=True, cache_time=0)
     await c.message.delete()
     await manager.done()
 
 
+async def get_top(**kwargs):
+    groups = await Group.get_all_groups()
+    parsed = [(group, groups.index(group)) for group in groups]
+    return {"groups": parsed}
+
+
 ui = Dialog(
     Window(
-        Const("<b>📎 Тестовый диалог</b>"),
-        Button(Const("Кнопка"), id="test_button", on_click=show_alert),
-        state=SampleDialog.greeting,
+        Const("<b>Выберите группу: </b>"),
+        ScrollingGroup(
+            Select(
+                Format("{item[0]}"),
+                items="groups",
+                item_id_getter=itemgetter(1),
+                on_click=callback,
+                id="s_group",
+            ),
+            width=1,
+            height=5,
+            id="scroll_with_pager",
+        ),
+        Button(Const("Закрыть"), id="close", on_click=callback),
+        state=GroupDialog.choice,
+        getter=get_top,
     ),
 )

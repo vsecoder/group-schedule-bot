@@ -45,6 +45,11 @@ class Group(models.Group):
     async def create_group(cls, group: str) -> None:
         await Group(name=group).save()
 
+    @classmethod
+    async def get_all_groups(cls) -> list:
+        groups = await cls.all()
+        return [group.name for group in groups]
+
 
 class Schedule(models.Schedule):
     @classmethod

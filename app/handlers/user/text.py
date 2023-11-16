@@ -29,7 +29,7 @@ async def text_handler(message: Message):
 
     day = lessons[days[message.text]]
 
-    text = ""
+    text = '<pre><code class="language-table">'
     for lesson in day:
         if type(lesson) == list:
             lesson1 = lesson[0] if lesson[0] != None else "Нет пары"
@@ -37,5 +37,7 @@ async def text_handler(message: Message):
             text += f"{lesson1} | {lesson2}\n"
         else:
             text += f"{lesson if lesson != None else 'Нет пары'}\n"
+
+    text += "</code></pre>"
 
     await message.answer(text)
