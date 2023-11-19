@@ -11,7 +11,7 @@ from aiogram import Bot
 
 async def scheduler(bot: Bot):
     logging.info("Running background worker")
-    aioschedule.every().day.at("12:55").do(main_schedule, bot=bot)
+    aioschedule.every().day.at("15:00").do(main_schedule, bot=bot)
     while True:
         await aioschedule.run_pending()
         await asyncio.sleep(3)
