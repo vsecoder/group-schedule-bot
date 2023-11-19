@@ -1,6 +1,6 @@
 async def format_schedule(day):
     text = ""
-    index = 0
+    index = 1
 
     for lesson in day:
         if type(lesson) == list:
