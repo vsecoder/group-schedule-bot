@@ -10,3 +10,4 @@ redis
 tgcrypto
 toml
 tortoise-orm
+xlrd

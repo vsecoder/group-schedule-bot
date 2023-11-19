@@ -2,6 +2,7 @@ from aiogram import Router
 from aiogram.types import Message
 
 from app.db.functions import User, Schedule
+from app.utils.formatter import format_schedule
 
 router = Router()
 
@@ -29,15 +30,6 @@ async def text_handler(message: Message):
 
     day = lessons[days[message.text]]
 
-    text = '<pre><code class="language-table">'
-    for lesson in day:
-        if type(lesson) == list:
-            lesson1 = lesson[0] if lesson[0] != None else "Нет пары"
-            lesson2 = lesson[1] if lesson[1] != None else "Нет пары"
-            text += f"{lesson1} | {lesson2}\n"
-        else:
-            text += f"{lesson if lesson != None else 'Нет пары'}\n"
-
-    text += "</code></pre>"
+    text = await format_schedule(day)
 
     await message.answer(text)
