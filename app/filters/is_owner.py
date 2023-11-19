@@ -5,9 +5,7 @@ from app.config import Config
 
 
 class IsOwner(Filter):
-    """
-    Check if user is owner (owner_id from config)
-    """
+    """Check if user is owner (owner_id from config)"""
 
     def __init__(self, is_owner: bool) -> None:
         self.is_owner = is_owner
