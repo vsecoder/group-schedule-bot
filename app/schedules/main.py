@@ -9,7 +9,7 @@ from datetime import datetime
 from aiogram import Bot
 
 
-async def scheduler(bot: Bot):
+async def scheduler(bot: Bot) -> None:
     logging.info("Running background worker")
     aioschedule.every().day.at("15:00").do(main_schedule, bot=bot)
     while True:
@@ -17,14 +17,15 @@ async def scheduler(bot: Bot):
         await asyncio.sleep(3)
 
 
-async def main_schedule(bot: Bot):
+async def main_schedule(bot: Bot) -> None:
     logging.info("Running main schedule")
     # send next day schedule
     now = datetime.now().weekday()
 
     if now == 5:
         return
-    elif now == 6:
+
+    if now == 6:
         now = 0
     else:
         now += 1

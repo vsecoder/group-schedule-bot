@@ -8,6 +8,12 @@ from app.db import models
 class User(models.User):
     @classmethod
     async def is_registered(cls, telegram_id: int) -> Union[models.User, bool]:
+        """
+        Check if user is registered
+
+        :param telegram_id: Telegram user id
+        :return: User object or False
+        """
         try:
             return await cls.get(telegram_id=telegram_id)
         except DoesNotExist:
@@ -15,26 +21,49 @@ class User(models.User):
 
     @classmethod
     async def register(cls, telegram_id) -> None:
+        """
+        Create new user
+
+        :param telegram_id: Telegram user id
+        :return: None
+        """
         await User(telegram_id=telegram_id).save()
 
     @classmethod
     async def get_count(cls) -> int:
+        """
+        Get count of registered users
+
+        :return: Count of registered users
+        """
         return await cls.all().count()
 
     @classmethod
     async def edit_group(cls, telegram_id, group) -> bool:
+        """
+        Edit user group
+
+        :param telegram_id: Telegram user id
+        :param group: New group
+        :return: True if group exists, else False
+        """
         user = await cls.get(telegram_id=telegram_id)
         user.group = group
         if await Group.group_exists(group):
             await user.save()
             return True
-        else:
-            return False
+        return False
 
 
 class Group(models.Group):
     @classmethod
     async def group_exists(cls, group: str) -> bool:
+        """
+        Check if group exists
+
+        :param group: Group name
+        :return: True if group exists, else False
+        """
         try:
             await cls.get(name=group)
             return True
@@ -43,10 +72,21 @@ class Group(models.Group):
 
     @classmethod
     async def create_group(cls, group: str) -> None:
+        """
+        Create new group
+
+        :param group: Group name
+        :return: None
+        """
         await Group(name=group).save()
 
     @classmethod
     async def get_all_groups(cls) -> list:
+        """
+        Get all groups
+
+        :return: List of groups
+        """
         groups = await cls.all()
         return [group.name for group in groups]
 
@@ -54,6 +94,12 @@ class Group(models.Group):
 class Schedule(models.Schedule):
     @classmethod
     async def get_schedule(cls, group: str) -> Union[models.Schedule, bool]:
+        """
+        Get schedule by group
+
+        :param group: Group name
+        :return: Schedule object or False
+        """
         try:
             return await cls.get(group=group)
         except DoesNotExist:
@@ -61,10 +107,24 @@ class Schedule(models.Schedule):
 
     @classmethod
     async def create_schedule(cls, group: str, lessons: dict) -> None:
+        """
+        Create new schedule
+
+        :param group: Group name
+        :param lessons: Lessons
+        :return: None
+        """
         await Schedule(group=group, lessons=lessons).save()
 
     @classmethod
     async def edit_schedule(cls, group: str, lessons: dict) -> None:
+        """
+        Edit schedule
+
+        :param group: Group name
+        :param lessons: Lessons
+        :return: None
+        """
         schedule = await cls.get(group=group)
         schedule.lessons = lessons
         await schedule.save()

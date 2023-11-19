@@ -18,7 +18,7 @@ async def text_handler(message: Message):
         "Сб": 5,
     }
 
-    if not message.text in days:
+    if message.text not in days:
         return
 
     group = (await User.get(telegram_id=message.from_user.id)).group

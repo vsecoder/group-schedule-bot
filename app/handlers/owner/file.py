@@ -2,7 +2,7 @@ from aiogram import F
 from aiogram import Router
 from aiogram.types import Message
 
-from app.db.functions import User, Schedule, Group
+from app.db.functions import Schedule, Group
 from app.utils.formatter import excel_to_schedule
 import xlrd, os
 

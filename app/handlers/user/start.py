@@ -3,7 +3,7 @@ from aiogram.filters import CommandStart
 from aiogram.types import Message
 from aiogram_dialog import DialogManager
 
-from app.db.functions import User, Schedule
+from app.db.functions import User
 from app.keyboards.reply import main_menu
 from app.dialogs.choice_group import GroupDialog
 
