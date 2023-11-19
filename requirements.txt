@@ -12,3 +12,4 @@ tgcrypto
 toml
 tortoise-orm
 xlrd
+gitpython

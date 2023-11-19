@@ -10,7 +10,7 @@ def get_handlers_router() -> Router:
     user_router = get_user_router()
     owner_router = get_owner_router()
 
-    router.include_router(user_router)
     router.include_router(owner_router)
+    router.include_router(user_router)
 
     return router

@@ -1,5 +1,6 @@
 import asyncio
 import logging
+import git
 
 import coloredlogs
 from aiogram import Bot, Dispatcher
@@ -8,7 +9,7 @@ from aiogram.client.telegram import TelegramAPIServer
 from aiogram.fsm.storage.memory import MemoryStorage
 from aiogram_dialog import setup_dialogs
 
-from app import db
+from app import db, version
 from app.arguments import parse_arguments
 from app.config import Config, parse_config
 from app.db import close_orm, init_orm
@@ -17,6 +18,8 @@ from app.handlers import get_handlers_router
 from app.middlewares import register_middlewares
 from app.commands import remove_bot_commands, setup_bot_commands
 from app.schedules import scheduler
+
+from datetime import datetime
 
 
 async def on_startup(dispatcher: Dispatcher, bot: Bot, config: Config):
@@ -86,9 +89,22 @@ async def main():
     dp.startup.register(on_startup)
     dp.shutdown.register(on_shutdown)
 
+    repo = git.Repo()
+    build = repo.heads[0].commit.hexsha
+    diff = repo.git.log([f"HEAD..origin/{version.branch}", "--oneline"])
+    upd = "Update required" if diff else "Up-to-date"
+
     registry = setup_dialogs(dp)
 
-    context_kwargs = {"config": config, "registry": registry}
+    start_time = datetime.now()
+
+    context_kwargs = {
+        "config": config,
+        "build": build,
+        "upd": upd,
+        "start_time": start_time,
+        "registry": registry,
+    }
 
     asyncio.create_task(scheduler(bot=bot))
 

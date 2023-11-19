@@ -6,6 +6,8 @@ from app.commands import owner_commands, users_commands
 from app.config import Config
 from app.keyboards.inline import get_author_keyboard
 
+from datetime import datetime
+
 router = Router()
 
 
@@ -23,12 +25,14 @@ async def help_handler(message: Message, config: Config):
 
 
 @router.message(Command(commands=["about"]))
-async def about_handler(message: Message, bot: Bot, config: Config):
-    bot_information = await bot.get_me()
+async def about_handler(message: Message, config: Config, build, upd, start_time):
+    link = "https://github.com/vsecoder/group-schedule-bot"
+    text = f"🗓 <b>group-schedule-bot</b> - <a href='{link}'>GitHub</a>\n\n"
+    text += f"<b>💫 Version:</b> {upd} #{build[:7]}\n"
+    text += f"<b>⌛️ Uptime:</b> {datetime.now() - start_time}"
+
     await message.answer(
-        "<b>ℹ️ Информация о боте:</b> \n\n"
-        f"<b>Название - </b> {bot_information.full_name} \n"
-        f"<b>Username - </b> @{bot_information.username} \n"
-        f"<b>ID - </b> <code>{bot_information.id}</code> \n",
-        reply_markup=get_author_keyboard(owner_id=config.settings.owner_id),
+        text,
+        reply_markup=get_author_keyboard(config.settings.owner_id),
+        disable_web_page_preview=True,
     )
