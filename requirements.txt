@@ -3,6 +3,7 @@ aiogram-dialog==2.0.0
 aiogram==3.0.0
 aiohttp
 aiosqlite
+aioschedule
 cachetools
 coloredlogs
 pyrogram>=2.0.0
