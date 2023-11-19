@@ -4,7 +4,7 @@ import logging
 
 from app.db.functions import User, Schedule
 from app.utils.formatter import format_schedule
-from datetime import datetime, timedelta
+from datetime import datetime
 
 from aiogram import Bot
 

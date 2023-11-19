@@ -21,6 +21,11 @@ async def callback(c: CallbackQuery, widget: Any, manager: DialogManager, item_i
     await manager.done()
 
 
+async def close(c: CallbackQuery, widget: Any, manager: DialogManager):
+    await c.message.delete()
+    await manager.done()
+
+
 async def get_top(**kwargs):
     groups = await Group.get_all_groups()
     parsed = [(group, groups.index(group)) for group in groups]
@@ -42,7 +47,7 @@ ui = Dialog(
             height=5,
             id="scroll_with_pager",
         ),
-        Button(Const("Закрыть"), id="close", on_click=callback),
+        Button(Const("Закрыть"), id="close", on_click=close),
         state=GroupDialog.choice,
         getter=get_top,
     ),
