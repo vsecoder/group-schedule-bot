@@ -4,7 +4,16 @@ from aiogram.types import Message
 from app.db.functions import User, Schedule
 from app.utils.formatter import format_schedule
 
+from app.filters.is_registered import IsRegistered
+
 router = Router()
+
+
+@router.message(IsRegistered(False))
+async def not_registered_handler(message: Message):
+    await message.answer(
+        "По какой-то причине вы не зарегистрированы в боте, введите /start"
+    )
 
 
 @router.message()

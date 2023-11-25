@@ -9,7 +9,12 @@ users_commands = {
     "group": "Выбрать группу",
 }
 
-owner_commands = {**users_commands, "ping": "Check bot ping", "stats": "Show bot stats"}
+owner_commands = {
+    **users_commands,
+    "ping": "Check bot ping",
+    "stats": "Show bot stats",
+    "mail": "Send mail to all users",
+}
 
 
 async def setup_bot_commands(bot: Bot, config: Config):

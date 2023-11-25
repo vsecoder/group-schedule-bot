@@ -15,6 +15,14 @@ class GroupDialog(StatesGroup):
 
 async def callback(c: CallbackQuery, widget: Any, manager: DialogManager, item_id: str):
     groups = await Group.get_all_groups()
+
+    if not await User.is_registered(telegram_id=c.from_user.id):
+        await c.answer(
+            "Ошибка, попробуйте перезапустить бота", show_alert=True, cache_time=0
+        )
+        await c.message.delete()
+        return await manager.done()
+
     await User.edit_group(c.message.chat.id, groups[int(item_id)])
     await c.answer("Группа выбрана!", show_alert=True, cache_time=0)
     await c.message.delete()
