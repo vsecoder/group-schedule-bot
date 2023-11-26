@@ -41,6 +41,6 @@ async def text_handler(message: Message):
 
     day = lessons[days[message.text]]
 
-    text = await format_schedule(day)
+    text = await format_schedule(day, message.text, "числителю / знаменателю")
 
     await message.answer(text)

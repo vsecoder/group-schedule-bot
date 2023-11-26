@@ -1,6 +1,8 @@
 from tortoise import fields
 from tortoise.models import Model
 
+from datetime import datetime
+
 
 class User(Model):
     id = fields.BigIntField(pk=True)
@@ -8,7 +10,7 @@ class User(Model):
     group = fields.CharField(max_length=255, null=True)
     role = fields.CharField(max_length=255, default="user")
     # for statistic later
-    date = fields.DatetimeField(auto_now_add=True)
+    date = fields.CharField(max_length=255, default=datetime.now().strftime("%d.%m.%Y"))
 
 
 class Group(Model):
