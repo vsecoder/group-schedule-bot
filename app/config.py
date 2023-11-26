@@ -51,7 +51,7 @@ class ConfigApi:
     bot_api_url: str = "https://api.telegram.org"
 
     @property
-    def is_local(self):
+    def is_local(self) -> bool:
         return self.bot_api_url != "https://api.telegram.org"
 
 
@@ -86,6 +86,7 @@ class Config:
 
 
 def parse_config(config_file: str) -> Config:
+    """Parse config file"""
     if not os.path.isfile(config_file) and not config_file.endswith(".toml"):
         config_file += ".toml"
 

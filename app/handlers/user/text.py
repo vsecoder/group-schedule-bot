@@ -11,9 +11,7 @@ router = Router()
 
 @router.message(IsRegistered(False))
 async def not_registered_handler(message: Message):
-    """
-    If user not registered, send this message
-    """
+    """If user not registered, send this message"""
     await message.answer(
         "По какой-то причине вы не зарегистрированы в боте, введите /start"
     )
@@ -21,9 +19,7 @@ async def not_registered_handler(message: Message):
 
 @router.message()
 async def text_handler(message: Message):
-    """
-    If user send text message, check if it is day of week
-    """
+    """If user send text message, check if it is day of week"""
     days = {
         "Пн": 0,
         "Вт": 1,

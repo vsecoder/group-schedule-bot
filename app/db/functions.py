@@ -106,25 +106,64 @@ class Schedule(models.Schedule):
             return False
 
     @classmethod
-    async def create_schedule(cls, group: str, lessons: dict) -> None:
+    async def create_schedule(cls, group: str, replacements: dict) -> None:
         """
         Create new schedule
 
         :param group: Group name
-        :param lessons: Lessons
+        :param replacements: replacements
         :return: None
         """
-        await Schedule(group=group, lessons=lessons).save()
+        await Schedule(group=group, replacements=replacements).save()
 
     @classmethod
-    async def edit_schedule(cls, group: str, lessons: dict) -> None:
+    async def edit_schedule(cls, group: str, replacements: dict) -> None:
         """
         Edit schedule
 
         :param group: Group name
-        :param lessons: Lessons
+        :param replacements: replacements
         :return: None
         """
         schedule = await cls.get(group=group)
-        schedule.lessons = lessons
+        schedule.replacements = replacements
         await schedule.save()
+
+
+class Replacement(models.Replacement):
+    @classmethod
+    async def get_replacement(cls, group: str) -> Union[models.Replacement, bool]:
+        """
+        Get replacement by group
+
+        :param group: Group name
+        :return: Replacement object or False
+        """
+        try:
+            return await cls.get(group=group)
+        except DoesNotExist:
+            return False
+
+    @classmethod
+    async def create_replacement(cls, group: str, replacements: dict) -> None:
+        """
+        Create new replacement
+
+        :param group: Group name
+        :param replacements: replacements
+        :return: None
+        """
+        await Replacement(group=group, replacements=replacements).save()
+
+    @classmethod
+    async def edit_replacement(cls, group: str, replacements: dict) -> None:
+        """
+        Edit replacement
+
+        :param group: Group name
+        :param replacements: replacements
+        :return: None
+        """
+        replacement = await cls.get(group=group)
+        replacement.replacements = replacements
+        await replacement.save()

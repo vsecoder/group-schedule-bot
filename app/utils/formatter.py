@@ -1,3 +1,6 @@
+"""Functions for formatting data"""
+
+
 async def format_schedule(day: list) -> str:
     """
     Format schedule
@@ -33,7 +36,7 @@ async def excel_to_schedule(excel: list) -> dict:
     """
     group = excel[0][0]
     excel = excel[2:]
-    empty_lesson = "нетпары"
+    empty_lesson = ["нетпары", "-", "н/б"]
 
     lessons = [[] for i in range(6)]
 
@@ -41,7 +44,7 @@ async def excel_to_schedule(excel: list) -> dict:
         for i in range(6):
             if not day[i]:
                 continue
-            if day[i].lower().replace(" ", "") == empty_lesson:
+            if day[i].lower().replace(" ", "") in empty_lesson:
                 lessons[i].append(None)
             else:
                 lessons[i].append(day[i])
@@ -50,3 +53,34 @@ async def excel_to_schedule(excel: list) -> dict:
         "group": group,
         "lessons": lessons,
     }
+
+
+async def get_excel_type(first: str) -> str:
+    """
+    Get excel type
+
+    :param excel: Excel file
+    :return: Excel type
+    """
+
+    if first.lower() == "замены":
+        return "replacements"
+    else:
+        return "schedule"
+
+
+async def excel_to_replace(excel: list) -> dict:
+    """
+    Convert excel to replace
+
+    :param excel: Excel table
+    :return: Replace dict
+    """
+    excel = excel[2:]
+    sequence = excel[0][2].replace(" ", "").lower() == "под чертой"
+    date = excel[0][3]
+    empty_lesson = ["нетпары", "-", "н/б"]
+
+    replaces = [[] for i in range(6)]
+
+    # line have group, lesson number, old lesson, new lesson, classroom

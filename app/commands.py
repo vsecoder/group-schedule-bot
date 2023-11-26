@@ -18,7 +18,8 @@ owner_commands = {
 }
 
 
-async def setup_bot_commands(bot: Bot, config: Config):
+async def setup_bot_commands(bot: Bot, config: Config) -> None:
+    """Setup bot commands"""
     await bot.set_my_commands(
         [
             BotCommand(command=command, description=description)
@@ -36,7 +37,8 @@ async def setup_bot_commands(bot: Bot, config: Config):
     )
 
 
-async def remove_bot_commands(bot: Bot, config: Config):
+async def remove_bot_commands(bot: Bot, config: Config) -> None:
+    """Remove bot commands"""
     await bot.delete_my_commands(scope=BotCommandScopeDefault())
     await bot.delete_my_commands(
         scope=BotCommandScopeChat(chat_id=config.settings.owner_id)

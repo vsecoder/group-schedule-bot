@@ -13,9 +13,7 @@ logger = logging.getLogger(__name__)
 
 
 async def scheduler(bot: Bot) -> None:
-    """
-    Run background worker
-    """
+    """Run background worker"""
     logger.info("Running background worker")
     aioschedule.every().day.at("15:00").do(main_schedule, bot=bot)
     while True:
@@ -24,9 +22,7 @@ async def scheduler(bot: Bot) -> None:
 
 
 async def main_schedule(bot: Bot) -> None:
-    """
-    Send schedule to all users
-    """
+    """Send schedule to all users"""
     logger.info("Running main schedule")
 
     now = datetime.now().weekday()
