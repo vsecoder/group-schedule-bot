@@ -1,7 +1,10 @@
 from aiogram import types
 
 
-async def main_menu():
+async def main_menu() -> types.ReplyKeyboardMarkup:
+    """
+    Main menu keyboard
+    """
     buttons = [
         [
             types.KeyboardButton(text="Пн"),

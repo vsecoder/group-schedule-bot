@@ -13,6 +13,9 @@ router = Router()
 
 @router.message(Command(commands=["help"]))
 async def help_handler(message: Message, config: Config):
+    """
+    Get list of commands
+    """
     text = "ℹ️ <b>Список команд:</b> \n\n"
     commands = (
         owner_commands.items()
@@ -26,6 +29,9 @@ async def help_handler(message: Message, config: Config):
 
 @router.message(Command(commands=["about"]))
 async def about_handler(message: Message, config: Config, build, upd, start_time):
+    """
+    Get info about bot (version, uptime, etc)
+    """
     link = "https://github.com/vsecoder/group-schedule-bot"
     text = f"🗓 <b>group-schedule-bot</b> - <a href='{link}'>GitHub</a>\n\n"
     text += f"<b>💫 Version:</b> {upd} #{build[:7]}\n"

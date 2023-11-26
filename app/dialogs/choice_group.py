@@ -13,7 +13,7 @@ class GroupDialog(StatesGroup):
     choice = State()
 
 
-async def callback(c: CallbackQuery, widget: Any, manager: DialogManager, item_id: str):
+async def callback(c: CallbackQuery, _: Any, manager: DialogManager, item_id: str):
     groups = await Group.get_all_groups()
 
     if not await User.is_registered(telegram_id=c.from_user.id):
@@ -29,7 +29,7 @@ async def callback(c: CallbackQuery, widget: Any, manager: DialogManager, item_i
     await manager.done()
 
 
-async def close(c: CallbackQuery, widget: Any, manager: DialogManager):
+async def close(c: CallbackQuery, _: Any, manager: DialogManager):
     await c.message.delete()
     await manager.done()
 

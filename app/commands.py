@@ -4,6 +4,7 @@ from aiogram.types import BotCommand, BotCommandScopeChat, BotCommandScopeDefaul
 from app.config import Config
 
 users_commands = {
+    "start": "Обновить данные и клавиатуру",
     "help": "Показать список команд",
     "about": "Показать информацию о боте",
     "group": "Выбрать группу",

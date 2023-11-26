@@ -7,10 +7,16 @@ from app.utils.formatter import format_schedule
 from datetime import datetime
 
 from aiogram import Bot
+from aiogram.exceptions import TelegramAPIError
+
+logger = logging.getLogger(__name__)
 
 
 async def scheduler(bot: Bot) -> None:
-    logging.info("Running background worker")
+    """
+    Run background worker
+    """
+    logger.info("Running background worker")
     aioschedule.every().day.at("15:00").do(main_schedule, bot=bot)
     while True:
         await aioschedule.run_pending()
@@ -18,8 +24,11 @@ async def scheduler(bot: Bot) -> None:
 
 
 async def main_schedule(bot: Bot) -> None:
-    logging.info("Running main schedule")
-    # send next day schedule
+    """
+    Send schedule to all users
+    """
+    logger.info("Running main schedule")
+
     now = datetime.now().weekday()
 
     if now == 5:
@@ -45,7 +54,7 @@ async def main_schedule(bot: Bot) -> None:
                     text,
                 )
                 sended += 1
-        except Exception:
+        except TelegramAPIError:
             pass
 
-    logging.info(f"Sended {sended} messages")
+    logger.info(f"Sended {sended} messages")
