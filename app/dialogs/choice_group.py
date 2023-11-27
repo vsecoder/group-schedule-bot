@@ -13,7 +13,9 @@ class GroupDialog(StatesGroup):
     choice = State()
 
 
-async def callback(c: CallbackQuery, _: Any, manager: DialogManager, item_id: str):
+async def callback(
+    c: CallbackQuery, _: Any, manager: DialogManager, item_id: str
+) -> None:
     groups = await Group.get_all_groups()
 
     if not await User.is_registered(telegram_id=c.from_user.id):
@@ -29,12 +31,13 @@ async def callback(c: CallbackQuery, _: Any, manager: DialogManager, item_id: st
     await manager.done()
 
 
-async def close(c: CallbackQuery, _: Any, manager: DialogManager):
+async def close(c: CallbackQuery, _: Any, manager: DialogManager) -> None:
     await c.message.delete()
     await manager.done()
 
 
-async def get_top(**kwargs):
+async def get_top(**kwargs) -> dict:
+    """Get all groups"""
     groups = await Group.get_all_groups()
     parsed = [(group, groups.index(group)) for group in groups]
     return {"groups": parsed}

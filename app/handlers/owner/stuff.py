@@ -11,9 +11,7 @@ router = Router()
 
 @router.message(IsOwner(is_owner=True), Command(commands=["ping"]))
 async def ping_handler(message: Message):
-    """
-    Get bot ping
-    """
+    """Get bot ping"""
     start = time.perf_counter_ns()
     reply_message = await message.answer("<code>⏱ Checking ping...</code>")
     end = time.perf_counter_ns()

@@ -10,9 +10,7 @@ router = Router()
 
 @router.message(IsOwner(is_owner=True), Command(commands=["stats"]))
 async def stats_handler(message: Message):
-    """
-    Get count of users
-    """
+    """Get count of users"""
     count = await User.get_count()
     await message.answer(
         f"📊 <b>Количество пользователей бота -</b> <code>{count}</code>"

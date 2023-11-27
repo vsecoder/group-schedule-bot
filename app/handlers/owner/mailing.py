@@ -15,9 +15,7 @@ logger = logging.getLogger(__name__)
 
 @router.message(IsOwner(is_owner=True), Command(commands=["mail"]))
 async def mail_handler(message: Message, bot: Bot):
-    """
-    Mailing to all users
-    """
+    """Mailing to all users"""
     users = await User.all()
     geted = 0
     text = message.text.split(maxsplit=1)[1]

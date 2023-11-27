@@ -14,9 +14,7 @@ router = Router()
 
 @router.message(IsOwner(is_owner=True), F.content_type.in_({"document", "image"}))
 async def file_handler(message: Message):
-    """
-    Catch file, need to update schedule (later lesson replacements)
-    """
+    """Catch file, need to update schedule (later lesson replacements)"""
     file_id = message.document.file_id
     file = await message.bot.get_file(file_id)
 
