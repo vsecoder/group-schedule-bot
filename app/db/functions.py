@@ -145,15 +145,20 @@ class Replacement(models.Replacement):
             return False
 
     @classmethod
-    async def create_replacement(cls, group: str, replacements: dict) -> None:
+    async def create_replacement(
+        cls, group: str, replacements: dict, sequence: str
+    ) -> None:
         """
         Create new replacement
 
         :param group: Group name
         :param replacements: replacements
+        :param sequence: left or right
         :return: None
         """
-        await Replacement(group=group, replacements=replacements).save()
+        await Replacement(
+            group=group, replacements=replacements, sequence=sequence
+        ).save()
 
     @classmethod
     async def edit_replacement(cls, group: str, replacements: dict) -> None:
@@ -167,3 +172,14 @@ class Replacement(models.Replacement):
         replacement = await cls.get(group=group)
         replacement.replacements = replacements
         await replacement.save()
+
+    @classmethod
+    async def get_sequence(cls, group: str) -> str:
+        """
+        Get sequence by group
+
+        :param group: Group name
+        :return: Sequence
+        """
+        replacement = await cls.get(group=group)
+        return replacement.sequence

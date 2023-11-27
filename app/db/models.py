@@ -27,3 +27,6 @@ class Schedule(Model):
 class Replacement(Model):
     id = fields.BigIntField(pk=True)
     replacements = fields.JSONField()
+
+    # left or right - чиcлитель или знаменатель
+    sequence = fields.CharField(max_length=255, default="left")

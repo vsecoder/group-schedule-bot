@@ -11,6 +11,12 @@ TEMPLATE_LESSON = """<code>№{number}.</code>
 
 """
 
+TEMPLATE_EMPTY_LESSON = """<code>№{number}.</code>
+📚 Нет пары
+⏰ с <i>{from_time}</i> по <i>{to_time}</i>
+
+"""
+
 TIME = [
     [  # будни
         ["08:00", "9:35"],
@@ -54,7 +60,9 @@ async def format_schedule(group_schedule: list, day: str, sequence: str) -> str:
             "class_num": "-",
         }
         if lesson is None:
-            data["lesson"] = "Нет пары"
+            schedule += TEMPLATE_EMPTY_LESSON.format(
+                number=index, from_time=data["from_time"], to_time=data["to_time"]
+            )
         else:
             if isinstance(lesson, list):
                 classes = [i.split(" - ")[1] if i else "-" for i in lesson]
@@ -67,13 +75,13 @@ async def format_schedule(group_schedule: list, day: str, sequence: str) -> str:
                 data["lesson"] = lesson
                 data["class_num"] = class_num
 
-        schedule += TEMPLATE_LESSON.format(
-            number=index,
-            lesson=data["lesson"],
-            from_time=data["from_time"],
-            to_time=data["to_time"],
-            class_num=data["class_num"],
-        )
+            schedule += TEMPLATE_LESSON.format(
+                number=index,
+                lesson=data["lesson"],
+                from_time=data["from_time"],
+                to_time=data["to_time"],
+                class_num=data["class_num"],
+            )
 
         index += 1
 
@@ -122,13 +130,14 @@ async def get_excel_type(first: str) -> str:
         return "schedule"
 
 
+"""TODO: write this
 async def excel_to_replace(excel: list) -> dict:
-    """
+    \"""
     Convert excel to replace
 
     :param excel: Excel table
     :return: Replace dict
-    """
+    \"""
     excel = excel[2:]
     sequence = excel[0][2].replace(" ", "").lower() == "под чертой"
     date = excel[0][3]
@@ -137,5 +146,5 @@ async def excel_to_replace(excel: list) -> dict:
     replaces = [[] for i in range(6)]
 
     # line have group, lesson number, old lesson, new lesson, classroom
-
     pass
+"""
