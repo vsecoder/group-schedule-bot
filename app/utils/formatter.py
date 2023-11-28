@@ -65,12 +65,29 @@ async def format_schedule(group_schedule: list, day: str, sequence: str) -> str:
             )
         else:
             if isinstance(lesson, list):
-                classes = [i.split(" - ")[1] if i else "-" for i in lesson]
+                classes = []
+                # classes = [i.split(" - ")[1] if i else "-" for i in lesson]
+                # TODO: fix this
+                for lesson_ in lesson:
+                    if not lesson_:
+                        classes.append("-")
+                        continue
+
+                    lesson_ = lesson_.split(" - ")
+                    if len(lesson_) == 1:
+                        classes.append("-")
+                        continue
+                    classes.append(lesson_[1] if lesson_ else "-")
+
                 lessons = [i.split(" - ")[0] if i else "Нет пары" for i in lesson]
                 data["lesson"] = f"{lessons[0]} / {lessons[1]}"
                 data["class_num"] = f"{classes[0]} / {classes[1]}"
             else:
-                class_num = lesson.split(" - ")[1] if lesson else "-"
+                class_num = "-"
+
+                if len(lesson.split(" - ")) > 1:
+                    class_num = lesson.split(" - ")[1] if lesson else "-"
+
                 lesson = lesson.split(" - ")[0] if lesson else "Нет пары"
                 data["lesson"] = lesson
                 data["class_num"] = class_num
