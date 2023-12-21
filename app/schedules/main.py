@@ -43,9 +43,8 @@ async def main_schedule(bot: Bot) -> None:
             if user.group:
                 lessons = (await Schedule.get_schedule(user.group)).lessons
                 day = lessons[now]
-                text = "Расписание на завтра:\n\n" + await format_schedule(
-                    day, now, "числителю / знаменателю"
-                )
+                days = ["пн", "вт", "ср", "чт", "пт", "сб"]
+                text = await format_schedule(day, days[now], "числителю / знаменателю")
 
                 await bot.send_message(
                     user.telegram_id,
