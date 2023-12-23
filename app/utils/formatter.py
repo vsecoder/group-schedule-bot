@@ -116,16 +116,32 @@ async def excel_to_schedule(excel: list) -> dict:
     excel = excel[2:]
     empty_lesson = ["нетпары", "-", "н/б"]
 
-    lessons = [[] for i in range(6)]
+    lessons = [[] for _ in range(6)]
 
     for day in excel:
         for i in range(6):
             if not day[i]:
                 continue
+
             if day[i].lower().replace(" ", "") in empty_lesson:
                 lessons[i].append(None)
-            else:
-                lessons[i].append(day[i])
+                continue
+
+            separated = day[i].split(" | ")
+
+            if len(separated) == 1:
+                lessons[i].append(separated[0])
+                continue
+
+            separated = [i.replace(" ", "").lower() for i in separated]
+
+            for j in range(len(separated)):
+                if separated[j] in empty_lesson:
+                    separated[j] = None
+                else:
+                    separated[j] = day[i].split(" | ")[j]
+
+            lessons[i].append(separated)
 
     return {
         "group": group,

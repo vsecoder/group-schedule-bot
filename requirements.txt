@@ -13,3 +13,4 @@ toml
 tortoise-orm
 xlrd
 gitpython
+asyncpg
