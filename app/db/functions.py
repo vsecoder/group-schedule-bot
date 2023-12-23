@@ -106,27 +106,27 @@ class Schedule(models.Schedule):
             return False
 
     @classmethod
-    async def create_schedule(cls, group: str, replacements: dict) -> None:
+    async def create_schedule(cls, group: str, lessons: dict) -> None:
         """
         Create new schedule
 
         :param group: Group name
-        :param replacements: replacements
+        :param lessons: lessons
         :return: None
         """
-        await Schedule(group=group, replacements=replacements).save()
+        await Schedule(group=group, lessons=lessons).save()
 
     @classmethod
-    async def edit_schedule(cls, group: str, replacements: dict) -> None:
+    async def edit_schedule(cls, group: str, lessons: dict) -> None:
         """
         Edit schedule
 
         :param group: Group name
-        :param replacements: replacements
+        :param lessons: lessons
         :return: None
         """
         schedule = await cls.get(group=group)
-        schedule.replacements = replacements
+        schedule.lessons = lessons
         await schedule.save()
 
 

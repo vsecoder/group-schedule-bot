@@ -40,7 +40,7 @@ async def file_handler(message: Message):
     else:
         await Group.create_group(schedule["group"])
 
-        await Schedule.create(
+        await Schedule.create_schedule(
             group=schedule["group"],
             lessons=schedule["lessons"],
         )
