@@ -41,7 +41,12 @@ async def main_schedule(bot: Bot) -> None:
     for user in users:
         try:
             if user.group:
-                lessons = (await Schedule.get_schedule(user.group)).lessons
+                lessons = await Schedule.get_schedule(user.group)
+
+                if not lessons:
+                    continue
+
+                lessons = lessons.lessons
                 day = lessons[now]
                 days = ["пн", "вт", "ср", "чт", "пт", "сб"]
                 text = await format_schedule(day, days[now], "числителю / знаменателю")
