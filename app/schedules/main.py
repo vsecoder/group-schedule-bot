@@ -1,13 +1,13 @@
 import asyncio
 import aioschedule
 import logging
-
-from app.db.functions import User, Schedule
-from app.utils.formatter import format_schedule
-from datetime import datetime
+from datetime import datetime, date
 
 from aiogram import Bot
 from aiogram.exceptions import TelegramAPIError
+
+from app.db.functions import User
+from app.utils.formatter import format_schedule
 
 logger = logging.getLogger(__name__)
 
@@ -26,37 +26,39 @@ async def main_schedule(bot: Bot) -> None:
     logger.info("Running main schedule")
 
     now = datetime.now().weekday()
+    current_week = (date.today().isocalendar()[1]) % 2
 
     if now == 5:
         return
-
     if now == 6:
+        current_week += 1
         now = 0
     else:
         now += 1
 
-    sended = 0
+    week_type = "числитель" if current_week == 0 else "знаменатель"
 
-    users = await User.all()
+    sent_count = 0
+    users = await User.all().prefetch_related("group")
+
     for user in users:
+        if not user.group:
+            continue
+
         try:
-            if user.group:
-                lessons = await Schedule.get_schedule(user.group)
+            lessons = await User.get_final_schedule(
+                user.telegram_id, date.today(), now, week_type
+            )
 
-                if not lessons:
-                    continue
+            if not lessons:
+                continue
 
-                lessons = lessons.lessons
-                day = lessons[now]
-                days = ["пн", "вт", "ср", "чт", "пт", "сб"]
-                text = await format_schedule(day, days[now], "числителю / знаменателю")
+            days = ["пн", "вт", "ср", "чт", "пт", "сб"]
+            text = await format_schedule(lessons, days[now], week_type)
 
-                await bot.send_message(
-                    user.telegram_id,
-                    text,
-                )
-                sended += 1
+            await bot.send_message(user.telegram_id, text)
+            sent_count += 1
         except TelegramAPIError:
             pass
 
-    logger.info(f"Sended {sended} messages")
+    logger.info(f"Отправлено {sent_count} сообщений")

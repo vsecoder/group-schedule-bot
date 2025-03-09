@@ -6,27 +6,43 @@ from datetime import datetime
 
 class User(Model):
     id = fields.BigIntField(pk=True, generated=True)
-    telegram_id = fields.BigIntField()
-    group = fields.CharField(max_length=255, null=True)
-    role = fields.CharField(max_length=255, default="user")
-    # for statistic later
-    date = fields.CharField(max_length=255, default=datetime.now().strftime("%d.%m.%Y"))
+    telegram_id = fields.BigIntField(unique=True)
+    group = fields.ForeignKeyField(
+        "models.Group", related_name="users", null=True
+    )
+    role = fields.CharField(
+        max_length=255, default="user"
+    )
+    date = fields.CharField(
+        max_length=255, default=datetime.now().strftime("%d.%m.%Y")
+    )
 
 
 class Group(Model):
     id = fields.BigIntField(pk=True, generated=True)
     name = fields.CharField(max_length=255)
 
+    schedules: fields.ReverseRelation["Schedule"]
+
 
 class Schedule(Model):
-    id = fields.BigIntField(pk=True, generated=True)
-    group = fields.CharField(max_length=255)
-    lessons = fields.JSONField()
+    id = fields.IntField(pk=True)
+    group = fields.ForeignKeyField("models.Group", related_name="schedules")
+    day_of_week = fields.IntField()
+    week_type = fields.CharField(
+        max_length=12
+    )
+    subject = fields.CharField(max_length=255)
+    time_slot = fields.IntField()
+    classroom = fields.CharField(
+        max_length=10, null=True
+    )
 
 
 class Replacement(Model):
-    id = fields.BigIntField(pk=True, generated=True)
-    replacements = fields.JSONField()
-
-    # left or right - чиcлитель или знаменатель
-    sequence = fields.CharField(max_length=255, default="left")
+    id = fields.IntField(pk=True)
+    group = fields.ForeignKeyField("models.Group", related_name="replacements")
+    date = fields.DateField()
+    subject = fields.CharField(max_length=255)
+    classroom = fields.CharField(max_length=10, null=True)
+    time_slot = fields.IntField()

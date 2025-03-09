@@ -16,41 +16,56 @@ class GroupDialog(StatesGroup):
 async def callback(
     c: CallbackQuery, _: Any, manager: DialogManager, item_id: str
 ) -> None:
-    groups = await Group.get_all_groups()
+    """Обработчик выбора группы"""
+    user_id = c.from_user.id
 
-    if not await User.is_registered(telegram_id=c.from_user.id):
+    if not await User.is_registered(telegram_id=user_id):
         await c.answer(
             "Ошибка, попробуйте перезапустить бота", show_alert=True, cache_time=0
         )
         await c.message.delete()
         return await manager.done()
 
-    await User.edit_group(c.message.chat.id, groups[int(item_id)])
-    await c.answer("Группа выбрана!", show_alert=True, cache_time=0)
+    groups = await Group.get_all_groups()
+
+    try:
+        selected_group = groups[int(item_id)]
+    except (IndexError, ValueError):
+        await c.answer("Ошибка при выборе группы!", show_alert=True, cache_time=0)
+        return
+
+    await User.edit_group(user_id, selected_group)
+    await c.answer(
+        f"Вы выбрали группу: {selected_group}!", show_alert=True, cache_time=0
+    )
     await c.message.delete()
     await manager.done()
 
 
 async def close(c: CallbackQuery, _: Any, manager: DialogManager) -> None:
+    """Закрытие диалога"""
     await c.message.delete()
     await manager.done()
 
 
 async def get_top(**kwargs) -> dict:
-    """Get all groups"""
+    """Получает все группы и форматирует их для списка"""
     groups = await Group.get_all_groups()
-    parsed = [(group, groups.index(group)) for group in groups]
-    return {"groups": parsed}
+    return {"groups": list(enumerate(groups))}
 
 
 ui = Dialog(
     Window(
-        Const("<b>Выберите группу: </b>"),
+        Const("<b>Выберите группу: </b>\n"),
+        Const("Не хватает вашей группы? "),
+        Const(
+            "<a href='https://telegra.ph/Ne-hvataet-raspisaniya-vashej-gruppy-03-09'>Прочтите</a>"
+        ),
         ScrollingGroup(
             Select(
-                Format("{item[0]}"),
+                Format("{item[1]}"),
                 items="groups",
-                item_id_getter=itemgetter(1),
+                item_id_getter=itemgetter(0),
                 on_click=callback,
                 id="s_group",
             ),
@@ -61,5 +76,6 @@ ui = Dialog(
         Button(Const("Закрыть"), id="close", on_click=close),
         state=GroupDialog.choice,
         getter=get_top,
+        disable_web_page_preview=True,
     ),
 )

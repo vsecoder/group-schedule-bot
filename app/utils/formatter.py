@@ -1,5 +1,9 @@
 """Functions for formatting data"""
 
+import pandas as pd
+from app.db.functions import Schedule, Group
+
+
 TEMPLATE_SCHEDULE = """<b>📅 Расписание на {day} (по {sequence}):</b>
 
 {schedule}"""
@@ -40,144 +44,94 @@ TIME = [
 
 async def format_schedule(group_schedule: list, day: str, sequence: str) -> str:
     """
-    Format schedule
+    Форматирует расписание в читабельный вид
 
-    :param day: List of lessons
-    :return: Formatted schedule
+    :param group_schedule: Список пар на день
+    :param day: День недели
+    :param sequence: Числитель/Знаменатель
+    :return: Отформатированное расписание
     """
-    schedule = ""
-    index = 1
-    time = TIME[0] if day != "Сб" else TIME[1]
+    schedule_text = ""
+    time_slots = TIME[0] if day.lower() != "сб" else TIME[1]
 
-    if group_schedule == [None]:
-        return "✨ Нет пар"
+    if not group_schedule or group_schedule == [None]:
+        return f"✨ Нет пар на {day}"
 
-    for lesson in group_schedule:
-        data = {
-            "lesson": None,
-            "from_time": time[index - 1][0],
-            "to_time": time[index - 1][1],
-            "class_num": "-",
-        }
-        if lesson is None:
-            schedule += TEMPLATE_EMPTY_LESSON.format(
-                number=index, from_time=data["from_time"], to_time=data["to_time"]
-            )
-        else:
-            if isinstance(lesson, list):
-                classes = []
-                # classes = [i.split(" - ")[1] if i else "-" for i in lesson]
-                # TODO: fix this
-                for lesson_ in lesson:
-                    if not lesson_:
-                        classes.append("-")
-                        continue
-
-                    lesson_ = lesson_.split(" - ")
-                    if len(lesson_) == 1:
-                        classes.append("-")
-                        continue
-                    classes.append(lesson_[1] if lesson_ else "-")
-
-                lessons = [i.split(" - ")[0] if i else "Нет пары" for i in lesson]
-                data["lesson"] = f"{lessons[0]} / {lessons[1]}"
-                data["class_num"] = f"{classes[0]} / {classes[1]}"
-            else:
-                class_num = "-"
-
-                if len(lesson.split(" - ")) > 1:
-                    class_num = lesson.split(" - ")[1] if lesson else "-"
-
-                lesson = lesson.split(" - ")[0] if lesson else "Нет пары"
-                data["lesson"] = lesson
-                data["class_num"] = class_num
-
-            schedule += TEMPLATE_LESSON.format(
-                number=index,
-                lesson=data["lesson"],
-                from_time=data["from_time"],
-                to_time=data["to_time"],
-                class_num=data["class_num"],
-            )
-
-        index += 1
-
-    return TEMPLATE_SCHEDULE.format(day=day, sequence=sequence, schedule=schedule)
-
-
-async def excel_to_schedule(excel: list) -> dict:
-    """
-    Convert excel to schedule
-
-    :param excel: Excel table
-    :return: Schedule dict
-    """
-    group = excel[0][0]
-    excel = excel[2:]
-    empty_lesson = ["нетпары", "-", "н/б"]
-
-    lessons = [[] for _ in range(6)]
-
-    for day in excel:
-        for i in range(6):
-            if not day[i]:
-                continue
-
-            if day[i].lower().replace(" ", "") in empty_lesson:
-                lessons[i].append(None)
-                continue
-
-            separated = day[i].split(" | ")
-
-            if len(separated) == 1:
-                lessons[i].append(separated[0])
-                continue
-
-            separated = [i.replace(" ", "").lower() for i in separated]
-
-            for j in range(len(separated)):
-                if separated[j] in empty_lesson:
-                    separated[j] = None
-                else:
-                    separated[j] = day[i].split(" | ")[j]
-
-            lessons[i].append(separated)
-
-    return {
-        "group": group,
-        "lessons": lessons,
+    schedule_by_slot = {
+        lesson["time_slot"]: lesson for lesson in group_schedule if lesson
     }
 
+    for slot, (from_time, to_time) in enumerate(time_slots, start=1):
+        lesson_data = schedule_by_slot.get(slot)
 
-async def get_excel_type(first: str) -> str:
+        if lesson_data:
+            schedule_text += TEMPLATE_LESSON.format(
+                number=slot,
+                lesson=lesson_data["subject"] or "-",
+                from_time=from_time,
+                to_time=to_time,
+                class_num=lesson_data["classroom"] or "-",
+            )
+        #else:
+        #    schedule_text += TEMPLATE_EMPTY_LESSON.format(
+        #        number=slot,
+        #        from_time=from_time,
+        #        to_time=to_time,
+        #    )
+
+    sequence = "числителю" if sequence == "denominator" else "знаменателю"
+
+    return TEMPLATE_SCHEDULE.format(day=day, sequence=sequence, schedule=schedule_text)
+
+
+async def excel_to_schedule(file_path: str) -> None:
     """
-    Get excel type
+    Парсинг Excel-таблицы и сохранение расписания в БД
 
-    :param excel: Excel file
-    :return: Excel type
+    :param file_path: Путь к Excel-файлу
     """
+    df = pd.read_excel(file_path, header=None)
 
-    if first.lower() == "замены":
-        return "replacements"
-    else:
-        return "schedule"
+    group_name = str(df.iloc[0, 0]).strip()
+    df = df.iloc[2:].reset_index(drop=True)
 
+    empty_lesson = {"нетпары", "-", "н/б", "", "nan"}
+    lessons = [[] for _ in range(6)] 
 
-"""TODO: write this
-async def excel_to_replace(excel: list) -> dict:
-    \"""
-    Convert excel to replace
+    await Group.get_or_create_group(group_name)
 
-    :param excel: Excel table
-    :return: Replace dict
-    \"""
-    excel = excel[2:]
-    sequence = excel[0][2].replace(" ", "").lower() == "под чертой"
-    date = excel[0][3]
-    empty_lesson = ["нетпары", "-", "н/б"]
+    for time_slot, row in df.iterrows():
+        for day in range(6):
+            cell_value = str(row[day]).strip() if pd.notna(row[day]) else ""
 
-    replaces = [[] for i in range(6)]
+            if cell_value.lower().replace(" ", "") in empty_lesson:
+                lessons[day].append(None)
+                continue
 
-    # line have group, lesson number, old lesson, new lesson, classroom
-    pass
-"""
+            separated = [part.strip() for part in cell_value.split(" | ")]
+
+            parsed_lessons = [
+                None if part.lower().replace(" ", "") in empty_lesson else part
+                for part in separated
+            ]
+
+            lessons[day].append(
+                {
+                    "time_slot": time_slot + 1,
+                    "week_type": "числитель" if len(parsed_lessons) > 1 else "всегда",
+                    "subject": parsed_lessons[0],
+                    "classroom": None,
+                }
+            )
+
+            if len(parsed_lessons) > 1:
+                lessons[day].append(
+                    {
+                        "time_slot": time_slot + 1,
+                        "week_type": "знаменатель",
+                        "subject": parsed_lessons[1],
+                        "classroom": None,
+                    }
+                )
+
+    await Schedule.update_or_create(group_name=group_name, lessons=lessons)

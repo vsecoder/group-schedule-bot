@@ -14,3 +14,5 @@ tortoise-orm
 xlrd
 gitpython
 asyncpg
+click
+pandas
