@@ -38,7 +38,7 @@ async def text_handler(message: Message):
         return
 
     current_week = (date.today().isocalendar()[1]) % 2
-    week_type = "числитель" if current_week == 0 else "знаменатель"
+    week_type = "числитель" if current_week == 1 else "знаменатель"
 
     lessons = await User.get_final_schedule(
         user.telegram_id, date.today(), DAYS[message.text], week_type

@@ -36,7 +36,7 @@ async def main_schedule(bot: Bot) -> None:
     else:
         now += 1
 
-    week_type = "числитель" if current_week == 0 else "знаменатель"
+    week_type = "числитель" if current_week == 1 else "знаменатель"
 
     sent_count = 0
     users = await User.all().prefetch_related("group")
