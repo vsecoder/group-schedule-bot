@@ -42,13 +42,16 @@ TIME = [
 ]
 
 
-async def format_schedule(group_schedule: list, day: str, sequence: str) -> str:
+async def format_schedule(
+    group_schedule: list, day: str, sequence: str, scheduled: bool = False
+) -> str:
     """
     Форматирует расписание в читабельный вид
 
     :param group_schedule: Список пар на день
     :param day: День недели
     :param sequence: Числитель/Знаменатель
+    :param scheduled: Флаг, определяющий, что сообщение из расписания
     :return: Отформатированное расписание
     """
     schedule_text = ""
@@ -72,16 +75,20 @@ async def format_schedule(group_schedule: list, day: str, sequence: str) -> str:
                 to_time=to_time,
                 class_num=lesson_data["classroom"] or "-",
             )
-        #else:
+        # else:
         #    schedule_text += TEMPLATE_EMPTY_LESSON.format(
         #        number=slot,
         #        from_time=from_time,
         #        to_time=to_time,
         #    )
 
-    sequence = "числителю" if sequence == "denominator" else "знаменателю"
+    sequence = "числителю" if sequence == "числитель" else "знаменателю"
 
-    return TEMPLATE_SCHEDULE.format(day=day, sequence=sequence, schedule=schedule_text)
+    return TEMPLATE_SCHEDULE.format(
+        day=day if not scheduled else "завтра",
+        sequence=sequence, 
+        schedule=schedule_text
+    )
 
 
 async def excel_to_schedule(file_path: str) -> None:

@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 async def scheduler(bot: Bot) -> None:
     """Run background worker"""
     logger.info("Running background worker")
-    aioschedule.every().day.at("15:00").do(main_schedule, bot=bot)
+    aioschedule.every().day.at("17:00").do(main_schedule, bot=bot)
     while True:
         await aioschedule.run_pending()
         await asyncio.sleep(3)
@@ -54,11 +54,11 @@ async def main_schedule(bot: Bot) -> None:
                 continue
 
             days = ["пн", "вт", "ср", "чт", "пт", "сб"]
-            text = await format_schedule(lessons, days[now], week_type)
+            text = await format_schedule(lessons, days[now], week_type, scheduled=True)
 
             await bot.send_message(user.telegram_id, text)
             sent_count += 1
         except TelegramAPIError:
-            pass
+            continue
 
     logger.info(f"Отправлено {sent_count} сообщений")
